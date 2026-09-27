@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZenVest | Smart SIP &amp; ETF Portfolio Analyzer</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+<!-- App stylesheet -->
+<link rel="stylesheet" href="style.css" />
+
+<!-- Chart.js (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-mark">ZV</span>
+      <span class="brand-name">ZenVest</span>
+    </div>
+
+    <div class="status-pill" title="Backend connection status">
+      <span class="pulse-dot"></span>
+      <span id="engine-status-text">Dummy Data Mode</span>
+    </div>
+
+    <div class="user-chip">
+      <div class="user-meta">
+        <span class="user-name">Aarav Mehta</span>
+        <span class="user-plan">Zen Pro</span>
+      </div>
+      <div class="avatar" aria-hidden="true">AM</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ MAIN LAYOUT ============ -->
+<main class="app-main">
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">Algorithmic SIP &amp; ETF Allocator</p>
+      <h1>Portfolio Analyzer Dashboard</h1>
+    </div>
+    <div class="page-head-badges">
+      <span class="chip"><span class="material-symbols-outlined">verified_user</span>SEBI-style Demo</span>
+      <span class="chip"><span class="material-symbols-outlined">sync</span>Next Rebalance: 01 Nov</span>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+
+    <!-- ============ LEFT: INPUT FORM PANEL ============ -->
+    <section class="panel glass form-panel" aria-labelledby="form-panel-title">
+      <div class="panel-header">
+        <div>
+          <h2 id="form-panel-title">Investment Constraints</h2>
+          <p class="panel-subtitle">Set your monthly cashflow &amp; risk posture</p>
+        </div>
+        <span class="tag">Algo v1.0</span>
+      </div>
+
+      <form id="sip-form" novalidate>
+
+        <!-- Monthly Investment -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label for="monthly-investment">Monthly SIP Amount</label>
+            <span class="field-hint">Auto-Debited</span>
+          </div>
+          <div class="currency-input">
+            <span class="currency-symbol">₹</span>
+            <input
+              type="number"
+              id="monthly-investment"
+              name="monthlyInvestment"
+              min="500"
+              max="1000000"
+              step="500"
+              value="25000"
+              required
+              inputmode="numeric"
+            />
+            <span class="currency-suffix">/ month</span>
+          </div>
+          <div class="preset-row">
+            <button type="button" class="preset-btn" data-amount="5000">₹5k</button>
+            <button type="button" class="preset-btn" data-amount="10000">₹10k</button>
+            <button type="button" class="preset-btn active" data-amount="25000">₹25k</button>
+            <button type="button" class="preset-btn" data-amount="50000">₹50k</button>
+            <button type="button" class="preset-btn" data-amount="100000">₹1L</button>
+          </div>
+        </div>
+
+        <!-- Time Horizon -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label for="horizon-slider">Time Horizon</label>
+            <span class="field-hint" id="horizon-display">15 Years</span>
+          </div>
+          <input
+            type="range"
+            id="horizon-slider"
+            name="timeHorizon"
+            min="1"
+            max="30"
+            step="1"
+            value="15"
+          />
+          <div class="slider-scale">
+            <span>1Y</span><span>10Y</span><span>20Y</span><span>30Y</span>
+          </div>
+        </div>
+
+        <!-- Risk Tolerance -->
+        <div class="field-group">
+          <div class="field-label-row">
+            <label>Risk Tolerance</label>
+            <span class="field-hint">Expected CAGR</span>
+          </div>
+          <div class="risk-options" role="radiogroup" aria-label="Risk Tolerance">
+
+            <button type="button" class="risk-card" data-risk="conservative" data-cagr="8.5"
+                    role="radio" aria-checked="false">
+              <span class="risk-icon material-symbols-outlined">shield</span>
+              <span class="risk-text">
+                <span class="risk-title">Conservative</span>
+                <span class="risk-desc">Defensive &amp; Debt Heavy</span>
+              </span>
+              <span class="risk-cagr">8.5%</span>
+            </button>
+
+            <button type="button" class="risk-card active" data-risk="moderate" data-cagr="12.2"
+                    role="radio" aria-checked="true">
+              <span class="risk-icon material-symbols-outlined">balance</span>
+              <span class="risk-text">
+                <span class="risk-title">Moderate Growth</span>
+                <span class="risk-desc">Optimal Sharpe Ratio</span>
+              </span>
+              <span class="risk-cagr">12.2%</span>
+            </button>
+
+            <button type="button" class="risk-card" data-risk="aggressive" data-cagr="15.4"
+                    role="radio" aria-checked="false">
+              <span class="risk-icon material-symbols-outlined">rocket_launch</span>
+              <span class="risk-text">
+                <span class="risk-title">Aggressive Alpha</span>
+                <span class="risk-desc">High Small &amp; Mid Cap Tilt</span>
+              </span>
+              <span class="risk-cagr">15.4%</span>
+            </button>
+
+          </div>
+          <!-- Hidden field carries the selected risk value for the form submission -->
+          <input type="hidden" id="risk-tolerance" name="riskTolerance" value="moderate" />
+          <input type="hidden" id="expected-cagr" name="expectedCagr" value="12.2" />
+        </div>
+
+        <button type="submit" class="btn-primary" id="analyze-btn">
+          <span class="material-symbols-outlined">query_stats</span>
+          <span>Analyze Portfolio</span>
+        </button>
+
+        <p class="form-note" id="form-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <!-- ============ RIGHT: RESULTS ============ -->
+    <section class="results-column">
+
+      <!-- Summary Cards -->
+      <div class="summary-grid">
+        <div class="panel glass summary-card">
+          <div class="summary-top">
+            <span class="summary-label">Total Invested</span>
+            <span class="badge badge-neutral">Principal</span>
+          </div>
+          <div class="summary-value" id="metric-invested">₹0</div>
+          <p class="summary-sub">
+            ₹<span id="metric-monthly">0</span> × <span id="metric-months">0</span> months
+          </p>
+        </div>
+
+        <div class="panel glass summary-card accent-primary">
+          <div class="summary-top">
+            <span class="summary-label">Estimated Returns</span>
+            <span class="badge badge-primary" id="metric-xirr-badge">+0% Return</span>
+          </div>
+          <div class="summary-value" id="metric-returns">₹0</div>
+          <p class="summary-sub">Compounded at <span id="metric-cagr-text">0% CAGR</span></p>
+        </div>
+
+        <div class="panel glass summary-card accent-secondary">
+          <div class="summary-top">
+            <span class="summary-label">Projected Corpus</span>
+            <span class="badge badge-secondary" id="metric-year-badge">Year 2040</span>
+          </div>
+          <div class="summary-value" id="metric-corpus">₹0</div>
+          <p class="summary-sub">Total invested + estimated returns</p>
+        </div>
+      </div>
+
+      <!-- Allocation Donut + Growth chart -->
+      <div class="panel glass chart-panel">
+        <div class="chart-panel-header">
+          <div>
+            <h3>Asset Allocation</h3>
+            <p class="panel-subtitle">Model weights for your selected risk profile</p>
+          </div>
+          <div class="tab-switch">
+            <button type="button" class="tab-btn active" id="tab-allocation">Allocation</button>
+            <button type="button" class="tab-btn" id="tab-growth">Growth Curve</button>
+          </div>
+        </div>
+
+        <div class="chart-panel-body">
+          <!-- Allocation (donut) view -->
+          <div id="view-allocation" class="chart-view">
+            <div class="donut-wrap">
+              <canvas id="allocationChart" width="240" height="240" aria-label="Asset allocation donut chart" role="img"></canvas>
+              <div class="donut-center">
+                <span class="donut-center-label">Total SIP</span>
+                <span class="donut-center-value" id="donut-center-amount">₹0</span>
+                <span class="donut-center-sub">100% Allocated</span>
+              </div>
+            </div>
+
+            <ul class="legend-list" id="allocation-legend">
+              <!-- populated by script.js -->
+            </ul>
+          </div>
+
+          <!-- Growth (line) view -->
+          <div id="view-growth" class="chart-view" hidden>
+            <canvas id="growthChart" height="260" aria-label="Portfolio growth projection chart" role="img"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+</main>
+
+<footer class="app-footer">
+  <p>ZenVest Portfolio Analyzer — figures are illustrative dummy projections, not investment advice.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
